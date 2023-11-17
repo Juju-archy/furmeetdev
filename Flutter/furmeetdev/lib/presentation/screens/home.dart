@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:furmeetdev/presentation/screens/connectionPage/login_screen.dart';
+import 'package:furmeetdev/presentation/widgets/drawer.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -18,7 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      //drawer: MyDrawer(),
+      drawer: MyDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -26,9 +28,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[200]),
               onPressed: () {
-                /*Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
                   return LoginPage();
-                }));*/
+                }));
               },
               child: Text("Connexion"),
             ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:furmeetdev/utils/functions.dart';
 import 'package:furmeetdev/presentation/widgets/drawer.dart';
-//import 'package:furmeet_test/page/profil/profil_modify.dart';
+import 'package:furmeetdev/presentation/screens/profile/profile_update.dart';
 
 class ProfilUSer extends StatefulWidget {
   @override
@@ -38,9 +38,9 @@ class _ProfilUserState extends State<ProfilUSer> {
                         ElevatedButton(
                           onPressed: (){
                             setState(() {
-                              /*Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
+                              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
                                 return ProfileUpdate();
-                              }));*/
+                              }));
                             });
                           },
                           child: Text('Modifier',  style: TextStyle(color: Colors.white, fontSize: 15),),

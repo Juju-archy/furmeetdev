@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:furmeet_test/page/connexion_page/login_success.dart';
+import 'package:furmeetdev/presentation/screens/connectionPage/login_success.dart';
 import 'package:furmeetdev/presentation/widgets/drawer.dart';
 import 'package:furmeetdev/utils/functions.dart';
 
@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text('Connexion'),
           ),
-          //drawer: MyDrawer(),
+          drawer: MyDrawer(),
           body: SingleChildScrollView(
             padding: EdgeInsets.all(20.0),
             child: Column(
@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                        image: AssetImage('lib/images/furmeet/logo_furmeet.png')
+                        image: AssetImage('assets/images/logo_furmeet.png')
                     ),
                   ),
                 ),
@@ -106,9 +106,9 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: (){
                     setState(() {
                       //chemin vers page Hello (voir feuille connexion)
-                      /*Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
                         return LoginSuccess();
-                      }));*/
+                      }));
                     });
                   },
                   child: Text('Connexion',  style: TextStyle(color: Colors.white, fontSize: 25),),
