@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furmeetdev/presentation/screens/connectionPage/login_success.dart';
+import 'package:furmeetdev/presentation/screens/profile/profile_creation.dart';
 import 'package:furmeetdev/presentation/widgets/drawer.dart';
 import 'package:furmeetdev/utils/functions.dart';
 
@@ -126,7 +127,9 @@ class _LoginPageState extends State<LoginPage> {
                   //Définir le onPressed pour la connexion
                   onPressed: (){
                     setState(() {
-                      //chemin vers page Hello (voir feuille connexion)
+                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                        return RegistrationUser();
+                      }));
                     });
                   },
                   child: Text(
