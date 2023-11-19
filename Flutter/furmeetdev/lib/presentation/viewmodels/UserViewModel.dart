@@ -11,6 +11,8 @@ class UserViewModel extends ChangeNotifier {
   //String? _imagePath;
   String? _city;
   String? _gender;
+  String _UPASS = '';
+  String _SALT = '';
   bool _isDarkMode = false;
 
   // Getter pour les propriétés
@@ -21,6 +23,8 @@ class UserViewModel extends ChangeNotifier {
   //String? get imagePath => _imagePath;
   String? get city => _city;
   String? get gender => _gender;
+  String get UPASS => _UPASS;
+  String get SALT => _SALT;
   bool get isDarkMode => _isDarkMode;
 
   // Setter pour les propriétés
@@ -64,6 +68,16 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  set UPASS(String value) {
+    _UPASS = value;
+    notifyListeners();
+  }
+
+  set SALT(String value) {
+    _SALT = value;
+    notifyListeners();
+  }
+
   // Fonction pour enregistrer l'utilisateur
   Future<void> registerUser(User user) async {
     var userData = {
@@ -73,7 +87,8 @@ class UserViewModel extends ChangeNotifier {
       'ubirthday': user.birthDate,
       'ucity': user.city,
       'ugender': user.gender,
-      'UPASS': user.password, // Ajoutez cette ligne si vous avez un champ de mot de passe dans votre modèle User
+      'UPASS': user.password,
+      'SALT': user.salt,
       'isdarkmode': user.isDarkMode,
     };
 

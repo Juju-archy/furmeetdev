@@ -7,6 +7,7 @@ class User {
   String? city;
   String? gender;
   String password;
+  String salt;
   int isDarkMode;
 
   User({
@@ -18,33 +19,36 @@ class User {
     this.city,
     this.gender,
     required this.password,
+    required this.salt,
     this.isDarkMode = 0,
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      pseudo: map['upseudo'], // Assurez-vous que le nom correspond à votre API
-      email: map['uemail'], // Assurez-vous que le nom correspond à votre API
+      pseudo: map['upseudo'],
+      email: map['uemail'],
       about: map['uabout'],
       birthDate: map['ubirthday'],
       //imagePath: map['imagePath'],
       city: map['ucity'],
       gender: map['ugender'],
-      password: map['UPASS'], // Assurez-vous que le nom correspond à votre API
+      password: map['UPASS'],
+      salt: map['SALT'],
       isDarkMode: int.parse(map['isdarkmode'] ?? '0'),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'upseudo': pseudo, // Assurez-vous que le nom correspond à votre API
-      'uemail': email, // Assurez-vous que le nom correspond à votre API
+      'upseudo': pseudo,
+      'uemail': email,
       'uabout': about,
       'ubirthday': birthDate,
       //'imagePath': imagePath,
       'ucity': city,
       'ugender': gender,
-      'UPASS': password, // Assurez-vous que le nom correspond à votre API
+      'UPASS': password,
+      'SALT': salt,
       'isdarkmode': isDarkMode,
     };
   }

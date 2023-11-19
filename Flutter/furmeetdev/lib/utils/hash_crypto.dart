@@ -8,6 +8,14 @@ String hashPassword(String password) {
   return digest.toString();
 }
 
+// Fonction pour hacher le mot de passe avec un sel
+String hashPasswordWithSalt(String password, String salt) {
+  var bytes = utf8.encode(password + salt);
+  var digest = sha256.convert(bytes);
+  return digest.toString();
+}
+
+// Fonction pour générer le salt
 String generateSalt() {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
   final random = Random();
