@@ -2,46 +2,50 @@ class User {
   String pseudo;
   String email;
   String? about;
-  DateTime birthDate;
-  String? imagePath;
+  String birthDate;
+  //String? imagePath;
   String? city;
   String? gender;
-  bool isDarkMode;
+  String password;
+  int isDarkMode;
 
   User({
     required this.pseudo,
     required this.email,
     this.about,
     required this.birthDate,
-    this.imagePath,
+    //this.imagePath,
     this.city,
     this.gender,
-    this.isDarkMode = false,
+    required this.password,
+    this.isDarkMode = 0,
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      pseudo: map['pseudo'],
-      email: map['email'],
-      about: map['about'],
-      birthDate: DateTime.parse(map['birthDate']),
-      imagePath: map['imagePath'],
-      city: map['city'],
-      gender: map['gender'],
-      isDarkMode: map['isDarkMode'] ?? false,
+      pseudo: map['upseudo'], // Assurez-vous que le nom correspond à votre API
+      email: map['uemail'], // Assurez-vous que le nom correspond à votre API
+      about: map['uabout'],
+      birthDate: map['ubirthday'],
+      //imagePath: map['imagePath'],
+      city: map['ucity'],
+      gender: map['ugender'],
+      password: map['UPASS'], // Assurez-vous que le nom correspond à votre API
+      isDarkMode: int.parse(map['isdarkmode'] ?? '0'),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'pseudo': pseudo,
-      'email': email,
-      'about': about,
-      'birthDate': birthDate.toIso8601String(),
-      'imagePath': imagePath,
-      'city': city,
-      'gender': gender,
-      'isDarkMode': isDarkMode,
+      'upseudo': pseudo, // Assurez-vous que le nom correspond à votre API
+      'uemail': email, // Assurez-vous que le nom correspond à votre API
+      'uabout': about,
+      'ubirthday': birthDate,
+      //'imagePath': imagePath,
+      'ucity': city,
+      'ugender': gender,
+      'UPASS': password, // Assurez-vous que le nom correspond à votre API
+      'isdarkmode': isDarkMode,
     };
   }
 }

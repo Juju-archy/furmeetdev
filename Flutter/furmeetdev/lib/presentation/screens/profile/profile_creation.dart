@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:furmeetdev/data/models/User.dart';
 import 'package:furmeetdev/utils/functions.dart';
 import 'package:furmeetdev/utils/hash_crypto.dart';
+import 'package:furmeetdev/presentation/viewmodels/UserViewModel.dart';
+import 'package:date_field/date_field.dart';
+
 
 class RegistrationUser extends StatefulWidget {
   @override
@@ -13,9 +16,9 @@ class _RegistrationUserState extends State<RegistrationUser> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _aboutController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
-  final TextEditingController _imagePathController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _isDarkModeController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
@@ -37,12 +40,13 @@ class _RegistrationUserState extends State<RegistrationUser> {
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   padding(10.0),
                   TextFormField(
                     controller: _pseudoController,
-                    decoration: InputDecoration(labelText: 'Pseudo'),
+                    decoration: InputDecoration(labelText: 'upseudo'), // Adapter le nom au champ de votre base de données
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez saisir un pseudo';
@@ -53,7 +57,7 @@ class _RegistrationUserState extends State<RegistrationUser> {
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: InputDecoration(labelText: 'uemail'), // Adapter le nom au champ de votre base de données
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez saisir un e-mail';
@@ -66,51 +70,51 @@ class _RegistrationUserState extends State<RegistrationUser> {
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _aboutController,
-                    decoration: InputDecoration(labelText: 'À propos'),
+                    decoration: InputDecoration(labelText: 'uabout'), // Adapter le nom au champ de votre base de données
                   ),
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _birthDateController,
-                    decoration: InputDecoration(labelText: 'Date de naissance'),
-                  ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    controller: _imagePathController,
-                    decoration: InputDecoration(labelText: 'Chemin de l\'image'),
+                    decoration: InputDecoration(labelText: 'ubirthday'), // Adapter le nom au champ de votre base de données
                   ),
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _cityController,
-                    decoration: InputDecoration(labelText: 'Ville'),
+                    decoration: InputDecoration(labelText: 'ucity'), // Adapter le nom au champ de votre base de données
                   ),
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _genderController,
-                    decoration: InputDecoration(labelText: 'Genre'),
+                    decoration: InputDecoration(labelText: 'ugender'), // Adapter le nom au champ de votre base de données
+                  ),
+                  SizedBox(height: 16.0),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(labelText: 'UPASS'), // Adapter le nom au champ de votre base de données
                   ),
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _isDarkModeController,
-                    decoration: InputDecoration(labelText: 'Mode sombre (true/false)'),
+                    decoration: InputDecoration(labelText: 'isdarkmode'), // Adapter le nom au champ de votre base de données
                   ),
                   SizedBox(height: 16.0),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
                         // Créer un utilisateur à partir des données saisies
                         User newUser = User(
                           pseudo: _pseudoController.text,
                           email: _emailController.text,
                           about: _aboutController.text,
-                          birthDate: DateTime.parse(_birthDateController.text),
-                          imagePath: _imagePathController.text,
+                          birthDate: _birthDateController.text,
                           city: _cityController.text,
                           gender: _genderController.text,
-                          isDarkMode: _isDarkModeController.text.toLowerCase() == 'false',
+                          password: _passwordController.text,
+                          isDarkMode: int.parse(_isDarkModeController.text),
                         );
 
-                        // Utilisez cet utilisateur comme bon vous semble (par exemple, enregistrez-le dans une base de données)
-                        // ...
+                        // Utilisez la fonction du ViewModel pour enregistrer l'utilisateur
+                        await UserViewModel().registerUser(newUser);
 
                         // Affichez un message de confirmation
                         showDialog(

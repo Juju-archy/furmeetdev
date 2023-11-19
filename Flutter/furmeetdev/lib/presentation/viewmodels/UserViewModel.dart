@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:furmeetdev/data/models/User.dart';
 
 class UserViewModel extends ChangeNotifier {
   String _pseudo = '';
   String _email = '';
   String? _about;
   DateTime _birthDate = DateTime.now();
-  String? _imagePath;
+  //String? _imagePath;
   String? _city;
   String? _gender;
   bool _isDarkMode = false;
@@ -17,7 +18,7 @@ class UserViewModel extends ChangeNotifier {
   String get email => _email;
   String? get about => _about;
   DateTime get birthDate => _birthDate;
-  String? get imagePath => _imagePath;
+  //String? get imagePath => _imagePath;
   String? get city => _city;
   String? get gender => _gender;
   bool get isDarkMode => _isDarkMode;
@@ -43,10 +44,10 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  set imagePath(String? value) {
+  /*set imagePath(String? value) {
     _imagePath = value;
     notifyListeners();
-  }
+  }*/
 
   set city(String? value) {
     _city = value;
@@ -64,21 +65,21 @@ class UserViewModel extends ChangeNotifier {
   }
 
   // Fonction pour enregistrer l'utilisateur
-  Future<void> registerUser() async {
+  Future<void> registerUser(User user) async {
     var userData = {
-      'pseudo': _pseudo,
-      'email': _email,
-      'about': _about,
-      'birthDate': _birthDate.toIso8601String(),
-      'imagePath': _imagePath,
-      'city': _city,
-      'gender': _gender,
-      'isDarkMode': _isDarkMode.toString(),
+      'uemail': user.email,
+      'upseudo': user.pseudo,
+      'uabout': user.about,
+      'ubirthday': user.birthDate,
+      'ucity': user.city,
+      'ugender': user.gender,
+      'UPASS': user.password, // Ajoutez cette ligne si vous avez un champ de mot de passe dans votre modèle User
+      'isdarkmode': user.isDarkMode,
     };
 
     // Envoyer les données à l'API
     var response = await http.post(
-      Uri.parse('http://votre-serveur/api.php'), // Remplacez par l'URL de votre API
+      Uri.parse('http://192.168.31.61/api_furmeet/user_api.php'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(userData),
     );
@@ -89,17 +90,5 @@ class UserViewModel extends ChangeNotifier {
     } else {
       print('Erreur lors de l\'enregistrement de l\'utilisateur. Code de statut : ${response.statusCode}');
     }
-
-    // Utilisez les propriétés actuelles du ViewModel pour enregistrer l'utilisateur
-    // Vous pouvez ajouter ici la logique d'enregistrement, par exemple, l'envoi des données à un backend
-    print('Enregistrement de l\'utilisateur avec les données suivantes:');
-    print('Pseudo: $_pseudo');
-    print('Email: $_email');
-    print('About: $_about');
-    print('Date de naissance: $_birthDate');
-    print('Image Path: $_imagePath');
-    print('Ville: $_city');
-    print('Genre: $_gender');
-    print('Mode sombre: $_isDarkMode');
   }
 }
