@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:furmeetdev/data/models/User.dart';
+import 'package:furmeetdev/presentation/screens/connectionPage/login_screen.dart';
 import 'package:furmeetdev/utils/functions.dart';
 import 'package:furmeetdev/utils/hash_crypto.dart';
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
 import 'package:furmeetdev/presentation/viewmodels/UserViewModel.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 
 
 class RegistrationUser extends StatefulWidget {
@@ -22,9 +23,12 @@ class _RegistrationUserState extends State<RegistrationUser> {
   final TextEditingController _birthDateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPass = TextEditingController();
 
-  bool isDarkMode = false;
+  final bool isDarkMode = false;
   String dropdownValue = list.first;
+  bool _isVisible = false;
+  bool _isVisible1 = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -41,14 +45,14 @@ class _RegistrationUserState extends State<RegistrationUser> {
           FocusScope.of(context).unfocus();
         },
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  padding(25.0),
+                  padding(20.0),
                   const Text(
                     'Inscription',
                     style: TextStyle(
@@ -58,12 +62,14 @@ class _RegistrationUserState extends State<RegistrationUser> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  padding(10.0),
+                  padding(30.0),
                   TextFormField(
                     controller: _pseudoController,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(45)
+                    ],
                     decoration: InputDecoration(
                       labelText: 'Pseudo',
-                      icon: Icon(Icons.account_circle),
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
@@ -76,9 +82,11 @@ class _RegistrationUserState extends State<RegistrationUser> {
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _emailController,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(45)
+                    ],
                     decoration: InputDecoration(
-                      labelText: 'Email',
-                      icon: Icon(Icons.mail_outline),
+                      labelText: 'Email\'',
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
@@ -93,17 +101,24 @@ class _RegistrationUserState extends State<RegistrationUser> {
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _aboutController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    minLines: 5,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(500)
+                    ],
                     decoration: InputDecoration(
-                      labelText: 'A propos',
-                      icon: Icon(Icons.abc),
+                      labelText: 'Description',
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _birthDateController,
+                    validator: MultiValidator([
+                      RequiredValidator(errorText: "* Requis"),
+                    ]),
                     decoration: InputDecoration(
-                      icon: Icon(Icons.calendar_today),
                       labelText: "Date de naissance",
                       border: OutlineInputBorder(),
                     ),
@@ -124,7 +139,7 @@ class _RegistrationUserState extends State<RegistrationUser> {
                           _birthDateController.text = formattedDate;
                         });
                       } else {
-                        print("Date is not selected");
+                        print("Veuillez sélectionner votre date de naissance");
                       }
                     },
                   ),
@@ -133,19 +148,16 @@ class _RegistrationUserState extends State<RegistrationUser> {
                     controller: _cityController,
                     decoration: InputDecoration(
                       labelText: 'Ville',
-                      icon: Icon(Icons.house_outlined),
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16.0),
-                  DropdownButton<String>(
-                    value: dropdownValue,
-                    elevation: 16,
-                    style: const TextStyle(color: Colors.black54),
-                    underline: Container(
-                      height: 2,
-                      color: Colors.deepPurpleAccent,
+                  DropdownButtonFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Genre',
+                      border: OutlineInputBorder(),
                     ),
+                    value: dropdownValue,
                     onChanged: (String? value) {
                       // This is called when the user selects an item.
                       setState(() {
@@ -159,43 +171,56 @@ class _RegistrationUserState extends State<RegistrationUser> {
                       );
                     }).toList(),
                   ),
-                  /*TextFormField(
-                    controller: _genderController,
-                    decoration: InputDecoration(
-                      labelText: 'Genre',
-                      border: OutlineInputBorder(),
-                      icon: Icon(Icons.transgender)
-                    ),
-                  ),*/
                   SizedBox(height: 16.0),
                   TextFormField(
+                    validator: MultiValidator([
+                      RequiredValidator(errorText: "* Requis"),
+                      MinLengthValidator(8,
+                          errorText:
+                          "Le mot de passe doit faire minimum 8 caractères"),
+                      PatternValidator(r'(?=.*?[#?!@$%^&*-])',
+                          errorText:
+                          'Le mot de passe doit contenir au minimum un caractère spéciale'),
+                      MaxLengthValidator(64,
+                          errorText:
+                          "Le mot de passe ne doit pas dépasser 64 caractères")
+                    ]),
+                    obscureText: !_isVisible,
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: 'Mot de passe',
                       border: OutlineInputBorder(),
-                      icon: Icon(Icons.key)
+                      suffixIcon: IconButton(
+                        icon: Icon(_isVisible ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () => setState(() {
+                          _isVisible = !_isVisible;
+                        }),
+                      ),
                     ),
                   ),
                   SizedBox(height: 16.0),
-                  /*TextFormField(
-                    controller: _isDarkModeController,
-                    decoration: InputDecoration(labelText: 'isdarkmode'),
-                  ),*/
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: isDarkMode,
-                        checkColor: Colors.white,
-                        onChanged: (value) {
-                          setState(() {
-                            isDarkMode = value ?? false;
-                          });
-                        },
+                  TextFormField(
+                      obscureText: !_isVisible1,
+                      controller: _confirmPass,
+                      decoration: InputDecoration(
+                        labelText: 'Confirmer le mot de passe',
+                        border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(_isVisible1 ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () => setState(() {
+                            _isVisible1 = !_isVisible1;
+                          }),
+                        ),
                       ),
-                      Text("Mode sombre"),
-                    ],
+                      validator: (val){
+                        if(val!.isEmpty)
+                          return 'Empty';
+                        if(val != _passwordController.text)
+                          return 'Not Match';
+                        return null;
+                      }
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(height: 30.0),
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
@@ -211,7 +236,6 @@ class _RegistrationUserState extends State<RegistrationUser> {
                           about: _aboutController.text,
                           birthDate: _birthDateController.text,
                           city: _cityController.text,
-                          //gender: _genderController.text,
                           gender: dropdownValue,
                           password: hashedPassword, // Utiliser le mot de passe haché
                           salt: salt, // Stocker le sel dans la base de données
@@ -233,7 +257,9 @@ class _RegistrationUserState extends State<RegistrationUser> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.pop(context);
+                                    Navigator.pop(context, MaterialPageRoute(builder: (BuildContext context) {
+                                      return LoginPage();
+                                    }));
                                   },
                                   child: Text('OK'),
                                 ),
@@ -253,6 +279,7 @@ class _RegistrationUserState extends State<RegistrationUser> {
                         )
                     ),
                   ),
+                  padding(30.0),
                 ],
               ),
             ),

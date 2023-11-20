@@ -4,14 +4,14 @@ import 'package:crypto/crypto.dart';
 
 String hashPassword(String password) {
   var bytes = utf8.encode(password);
-  var digest = sha256.convert(bytes);
+  var digest = sha512.convert(bytes);
   return digest.toString();
 }
 
 // Fonction pour hacher le mot de passe avec un sel
 String hashPasswordWithSalt(String password, String salt) {
   var bytes = utf8.encode(password + salt);
-  var digest = sha256.convert(bytes);
+  var digest = sha512.convert(bytes);
   return digest.toString();
 }
 
