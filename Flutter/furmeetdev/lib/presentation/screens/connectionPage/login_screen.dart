@@ -3,6 +3,7 @@ import 'package:furmeetdev/presentation/screens/connectionPage/login_success.dar
 import 'package:furmeetdev/presentation/screens/profile/profile_creation.dart';
 import 'package:furmeetdev/presentation/widgets/drawer.dart';
 import 'package:furmeetdev/utils/functions.dart';
+import 'package:furmeetdev/presentation/viewmodels/UserViewModel.dart';
 
 /*
 Login Page
@@ -25,6 +26,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late String email;
   late String password;
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
   bool _isVisible = false;
 
 
@@ -73,18 +77,24 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 padding(50),
-                TextField(
+                TextFormField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'E-mail'
                   ),
-                  onChanged: (String string){
-
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Veuillez saisir un e-mail';
+                    } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
+                      return 'Veuillez saisir un e-mail valide';
+                    }
+                    return null;
                   },
                 ),
                 padding(10),
-                //Password => modifier le
-                TextField(
+                TextFormField(
+                  controller: _passwordController,
                   obscureText: !_isVisible,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
@@ -96,21 +106,61 @@ class _LoginPageState extends State<LoginPage> {
                       }),
                     ),
                   ),
-                  onChanged: (String string){
-
-                  },
                 ),
                 padding(10),
                 padding(15),
                 ElevatedButton(
-                  //Définir le onPressed pour la connexion
-                  onPressed: (){
-                    setState(() {
-                      //chemin vers page Hello (voir feuille connexion)
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-                        return LoginSuccess();
-                      }));
-                    });
+                  onPressed: () async {
+                    // Vérifier les champs d'email et de mot de passe avant l'authentification
+                    if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+                      // Authentifier l'utilisateur
+                      bool isAuthenticated = await UserViewModel().authenticateUser(_emailController.text, _passwordController.text);
+
+                      if (isAuthenticated) {
+                        // L'utilisateur est authentifié avec succès, redirigez-le vers la page de succès
+                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                          return LoginSuccess();
+                        }));
+                      } else {
+                        // Afficher un message d'erreur si l'authentification échoue
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Erreur d\'authentification'),
+                              content: Text('Veuillez vérifier vos informations d\'identification.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    } else {
+                      // Afficher un message si les champs ne sont pas remplis
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Champs requis'),
+                            content: Text('Veuillez remplir tous les champs.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
                   child: Text('Connexion',  style: TextStyle(color: Colors.white, fontSize: 25),),
                   style: ElevatedButton.styleFrom(

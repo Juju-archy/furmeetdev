@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:furmeetdev/data/models/User.dart';
+import 'package:furmeetdev/utils/hash_crypto.dart';
 
 class UserViewModel extends ChangeNotifier {
   String _pseudo = '';
@@ -104,6 +105,44 @@ class UserViewModel extends ChangeNotifier {
       print('Utilisateur enregistré avec succès');
     } else {
       print('Erreur lors de l\'enregistrement de l\'utilisateur. Code de statut : ${response.statusCode}');
+    }
+  }
+
+  // Fonction pour authentifier l'utilisateur
+  Future<bool> authenticateUser(String email, String password) async {
+    try {
+      // Récupérer les informations de l'utilisateur à partir de l'API
+      var response = await http.post(
+        Uri.parse('http://192.168.31.61/api_furmeet/user_api.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'uemail': email}),
+      );
+
+      if (response.statusCode == 200) {
+        // Convertir la réponse JSON en une carte (map)
+        var userData = jsonDecode(response.body);
+
+        // Récupérer le sel et le mot de passe haché de la réponse
+        String salt = userData['SALT'];
+        String hashedPassword = hashPasswordWithSalt(password, salt);
+
+        // Vérifier si le mot de passe haché correspond au mot de passe stocké
+        if (hashedPassword == userData['UPASS']) {
+          // L'authentification réussit
+          return true;
+        } else {
+          // Mot de passe incorrect
+          return false;
+        }
+      } else {
+        // Échec de la requête à l'API
+        print('Erreur lors de la récupération des informations de l\'utilisateur. Code de statut : ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      // Gérer les erreurs
+      print('Erreur lors de l\'authentification de l\'utilisateur : $e');
+      return false;
     }
   }
 }

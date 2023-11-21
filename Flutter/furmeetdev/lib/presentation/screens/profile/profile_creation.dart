@@ -86,7 +86,7 @@ class _RegistrationUserState extends State<RegistrationUser> {
                       LengthLimitingTextInputFormatter(45)
                     ],
                     decoration: InputDecoration(
-                      labelText: 'Email\'',
+                      labelText: 'Email',
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
