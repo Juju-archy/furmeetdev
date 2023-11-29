@@ -20,7 +20,7 @@ class MyApp extends ConsumerWidget {
         ),
         useMaterial3: true,
       ),
-      home: isAuthenticated ? MyHomePage(title: 'Fur Meet') : LoginPage(),
+      home: isAuthenticated ? MyHomePage(title: 'Fur Meet') : LoginScreen(),
     );
   }
 }

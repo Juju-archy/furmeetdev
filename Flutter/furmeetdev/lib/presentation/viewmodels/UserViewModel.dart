@@ -128,6 +128,7 @@ class UserViewModel extends ChangeNotifier {
 
         // Vérifier si le mot de passe haché correspond au mot de passe stocké
         if (hashedPassword == userData['UPASS']) {
+          const Duration(milliseconds: 1000);
           // L'authentification réussit
           return true;
         } else {
@@ -145,4 +146,24 @@ class UserViewModel extends ChangeNotifier {
       return false;
     }
   }
+}
+
+class UserRequest {
+  UserRequest({
+    required this.identifier,
+    required this.password,
+  });
+
+  String identifier;
+  String password;
+
+  factory UserRequest.fromJson(Map<String, dynamic> json) => UserRequest(
+    identifier: json["identifier"],
+    password: json["password"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "identifier": identifier,
+    "password": password,
+  };
 }
