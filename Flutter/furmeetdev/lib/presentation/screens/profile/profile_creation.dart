@@ -258,7 +258,7 @@ class _RegistrationUserState extends State<RegistrationUser> {
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context, MaterialPageRoute(builder: (BuildContext context) {
-                                      return LoginPage();
+                                      return LoginScreen();
                                     }));
                                   },
                                   child: Text('OK'),
