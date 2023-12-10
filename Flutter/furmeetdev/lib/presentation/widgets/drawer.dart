@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:furmeetdev/presentation/screens/home.dart';
 import 'package:furmeetdev/presentation/screens/meetup/meetup_display.dart';
-import 'package:furmeetdev/presentation/screens/profile/profile_list.dart';
+import 'package:furmeetdev/presentation/screens/profile/profile_user.dart';
+
+import '../screens/connectionPage/login_screen.dart';
+import '../viewmodels/UserViewModel.dart';
 
 
 class MyDrawer extends StatelessWidget {
@@ -46,9 +49,20 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Mon Profil'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
+                return ProfilUSer();
+              }));
             },
           ),
+          TextButton(
+            onPressed: () async {
+              await UserViewModel().logout();
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) {
+                return LoginPage();
+              }));
+            },
+            child: Text('Déconnexion'),
+          )
         ],
       ),
     );

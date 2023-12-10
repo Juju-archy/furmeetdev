@@ -8,7 +8,8 @@ import 'package:furmeetdev/presentation/viewmodels/UserViewModel.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class RegistrationUser extends StatefulWidget {
   @override
@@ -31,6 +32,16 @@ class _RegistrationUserState extends State<RegistrationUser> {
   bool _isVisible1 = false;
 
   final _formKey = GlobalKey<FormState>();
+
+  final ImagePicker _imagePicker = ImagePicker();
+  XFile? _imageFile;
+
+  Future<void> _pickImage() async {
+    XFile? pickedImage = await _imagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _imageFile = pickedImage;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +74,16 @@ class _RegistrationUserState extends State<RegistrationUser> {
                     textAlign: TextAlign.center,
                   ),
                   padding(30.0),
+                  ElevatedButton(
+                    onPressed: _pickImage,
+                    child: Text('Sélectionner une photo de profil'),
+                  ),
+
+                  // Affichez l'image sélectionnée
+                  _imageFile != null
+                      ? Image.file(File(_imageFile!.path))
+                      : Container(),
+                  padding(16.0),
                   TextFormField(
                     controller: _pseudoController,
                     inputFormatters: [
@@ -224,12 +245,35 @@ class _RegistrationUserState extends State<RegistrationUser> {
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
+                        // Vérifier si l'email est unique
+                        bool isUnique = await UserViewModel().isEmailUnique(_emailController.text);
 
+                        if (!isUnique) {
+                          // Affichez un message d'erreur si l'email n'est pas unique
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Erreur d\'inscription'),
+                                content: Text('L\'email est déjà utilisé. Veuillez utiliser un autre email.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          return;
+                        }
+                        // Continuer avec l'enregistrement de l'utilisateur si l'email est unique
                         // Utilisation lors de l'enregistrement d'un nouvel utilisateur
-                        String salt = generateSalt(); // Générer un sel unique
+                        String salt = generateSalt();
                         String hashedPassword = hashPasswordWithSalt(_passwordController.text, salt);
 
-                        // Créer un utilisateur à partir des données saisies
                         User newUser = User(
                           pseudo: _pseudoController.text,
                           email: _emailController.text,
@@ -237,14 +281,11 @@ class _RegistrationUserState extends State<RegistrationUser> {
                           birthDate: _birthDateController.text,
                           city: _cityController.text,
                           gender: dropdownValue,
-                          password: hashedPassword, // Utiliser le mot de passe haché
-                          salt: salt, // Stocker le sel dans la base de données
+                          password: hashedPassword,
+                          salt: salt,
                           isDarkMode: isDarkMode ? 1 : 0,
                         );
-                        print(hashedPassword);
-                        print(salt);
 
-                        // Utilisez la fonction du ViewModel pour enregistrer l'utilisateur
                         await UserViewModel().registerUser(newUser);
 
                         // Affichez un message de confirmation
@@ -257,9 +298,11 @@ class _RegistrationUserState extends State<RegistrationUser> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.pop(context, MaterialPageRoute(builder: (BuildContext context) {
-                                      return LoginScreen();
-                                    }));
+                                    setState(() {
+                                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                                        return LoginPage();
+                                      }));
+                                    });
                                   },
                                   child: Text('OK'),
                                 ),
@@ -269,6 +312,8 @@ class _RegistrationUserState extends State<RegistrationUser> {
                         );
                       }
                     },
+
+                    // Style du bouton Inscription
                     child: Text('Inscription',  style: TextStyle(color: Colors.white, fontSize: 25),),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pinkAccent,

@@ -16,4 +16,3 @@ Text textWithStyle(String data, {color = Colors.white, fontSize = 20.0, fontStyl
 Padding padding(double top){
   return Padding(padding: EdgeInsets.only(top: top));
 }
-

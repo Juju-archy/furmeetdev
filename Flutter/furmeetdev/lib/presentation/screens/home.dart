@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[200]),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-                  return LoginScreen();
+                  return LoginPage();
                 }));
               },
               child: Text("Connexion"),

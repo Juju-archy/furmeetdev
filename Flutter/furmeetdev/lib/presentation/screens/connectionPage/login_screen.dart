@@ -1,49 +1,32 @@
-/*import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:furmeetdev/providers.dart';
+import 'package:flutter/material.dart';
 import 'package:furmeetdev/presentation/screens/connectionPage/login_success.dart';
 import 'package:furmeetdev/presentation/screens/profile/profile_creation.dart';
 import 'package:furmeetdev/presentation/widgets/drawer.dart';
 import 'package:furmeetdev/utils/functions.dart';
 import 'package:furmeetdev/presentation/viewmodels/UserViewModel.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';*/
 
-import 'package:furmeetdev/presentation/screens/profile/profile_creation.dart';
-import 'package:furmeetdev/utils/functions.dart';
-import 'package:furmeetdev/data/providers/user_controller.dart';
-import 'package:furmeetdev/presentation/screens/home.dart';
-import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:furmeetdev/presentation/viewmodels/UserViewModel.dart';
 
-class LoginScreen extends StatefulHookConsumerWidget {
-  const LoginScreen({super.key});
-
+class LoginPage extends StatefulWidget {
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LoginPageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
+class _LoginPageState extends State<LoginPage> {
+  late String email;
+  late String password;
   final TextEditingController _passwordController = TextEditingController();
-  bool _isHidden = true;
+  final TextEditingController _emailController = TextEditingController();
 
-  void _togglePasswordView() {
-    setState(() {
-      _isHidden = !_isHidden;
-    });
-  }
+  bool _isVisible = false;
 
-  void showSnackbar(BuildContext context, String text) {
-    final snackBar = SnackBar(
-      content: Text(text),
-      duration: const Duration(seconds: 5),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    //checkLoggedIn(context);
+  }
+
+  Widget build (BuildContext context) {
     double taille = MediaQuery.of(context).size.width * 0.5;
 
     return GestureDetector(
@@ -53,11 +36,13 @@ class _LoginPageState extends ConsumerState<LoginScreen> {
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text('Connexion'),
           ),
+          drawer: MyDrawer(),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(30),
+            padding: EdgeInsets.all(20.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                padding(20),
+                padding(25),
                 Container(
                   height: taille,
                   width: taille,
@@ -71,157 +56,137 @@ class _LoginPageState extends ConsumerState<LoginScreen> {
                     ],
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: AssetImage('assets/images/logo_furmeet.png'),
+                        image: AssetImage('assets/images/logo_furmeet.png')
                     ),
                   ),
                 ),
-                padding(40),
+                padding(20),
+                const Text(
+                  'Fur Meet',
+                  style: TextStyle(
+                    color: Colors.pinkAccent,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                padding(50),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: "Email",
-                    border: OutlineInputBorder(),
-                    icon: Icon(Icons.people), //icon at head of input
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'E-mail'
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez saisir un e-mail';
-                    } else if (!RegExp(
-                        r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
-                        .hasMatch(value)) {
+                    } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
                       return 'Veuillez saisir un e-mail valide';
                     }
                     return null;
                   },
                 ),
-                padding(20),
+                padding(10),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: _isHidden,
+                  obscureText: !_isVisible,
                   decoration: InputDecoration(
-                    icon: const Icon(Icons.lock), //icon at head of input
-                    //prefixIcon: Icon(Icons.people), //you can use prefixIcon property too.
-                    labelText: "Mot de passe",
                     border: OutlineInputBorder(),
+                    labelText: 'Mot de passe',
                     suffixIcon: IconButton(
-                      onPressed: _togglePasswordView,
-                      icon: Icon(
-                        _isHidden ? Icons.visibility : Icons.visibility_off,
-                      ),
-                    ), //icon at tail of input
+                      icon: Icon(_isVisible ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () => setState(() {
+                        _isVisible = !_isVisible;
+                      }),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                padding(20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
+                padding(10),
+                padding(15),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Vérifier les champs d'email et de mot de passe avant l'authentification
+                    if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+                      // Authentifier l'utilisateur
+                      bool isAuthenticated = await UserViewModel().authenticateUser(_emailController.text, _passwordController.text);
+                      print('Is authenticated : $isAuthenticated');
 
-                          // Vérifier les champs d'email et de mot de passe avant l'authentification
-                          if (_emailController.text.isNotEmpty &&
-                              _passwordController.text.isNotEmpty) {
-                            // Authentifier l'utilisateur
-                            bool isAuthenticated = await UserViewModel().authenticateUser(
-                                _emailController.text, _passwordController.text);
-
-
-                            if (isAuthenticated) {
-                              ref
-                                  .read(userControllerProvider.notifier)
-                                  .login(
-                                email: _emailController.text,
-                                password: _passwordController.text,
-                              )
-                                  .then(
-                                    (res) => {
-                                  res.fold(
-                                        (l) => {
-                                      showSnackbar(context, l),
-                                    },
-                                        (r) => {
-                                      Navigator.pushReplacementNamed(
-                                          context, 'Accueil'),
-                                    },
-                                  ),
-                                },
-                              );
-                            } else {
-                              // Afficher un message d'erreur si l'authentification échoue
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Erreur d\'authentification'),
-                                    content: Text(
-                                        'Veuillez vérifier vos informations d\'identification.'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('OK'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            }
-                          } else {
-                            // Afficher un message si les champs ne sont pas remplis
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Champs requis'),
-                                  content: Text('Veuillez remplir tous les champs.'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
+                      if (isAuthenticated) {
+                        // L'utilisateur est authentifié avec succès, redirigez-le vers la page de succès
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) {
+                          return LoginSuccess();
+                        }));
+                      } else {
+                        // Afficher un message d'erreur si l'authentification échoue
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Erreur d\'authentification'),
+                              content: Text('Veuillez vérifier vos informations d\'identification.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('OK'),
+                                ),
+                              ],
                             );
-                          }
+                          },
+                        );
+                      }
+                    } else {
+                      // Afficher un message si les champs ne sont pas remplis
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Champs requis'),
+                            content: Text('Veuillez remplir tous les champs.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
                         },
-                        child: Text(
-                          'Connexion',
-                          style: TextStyle(color: Colors.white, fontSize: 25),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.pinkAccent,
-                          fixedSize: const Size(300, 50),
-                          side: const BorderSide(width: 2, color: Colors.pink),
-                        ),
-                      ),
-                    ),
-                  ],
+                      );
+                    }
+                  },
+                  child: Text('Connexion',  style: TextStyle(color: Colors.white, fontSize: 25),),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pinkAccent,
+                      fixedSize: const Size(300, 50),
+                      side: const BorderSide(
+                          width: 2,
+                          color: Colors.pink
+                      )
+                  ),
                 ),
                 padding(10),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) {
-                          return RegistrationUser();
-                        },
-                      ),
-                    );
+                  //Définir le onPressed pour la connexion
+                  onPressed: (){
+                    setState(() {
+                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                        return RegistrationUser();
+                      }));
+                    });
                   },
                   child: Text(
                     'Inscription',
                     style: TextStyle(color: Colors.pink, fontSize: 23),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    fixedSize: const Size(300, 50),
-                    side: const BorderSide(width: 2, color: Colors.pinkAccent),
+                      backgroundColor: Colors.white,
+                      fixedSize: const Size(300, 50),
+                      side: const BorderSide(
+                          width: 2,
+                          color: Colors.pinkAccent
+                      )
                   ),
                 ),
                 padding(30),
@@ -229,13 +194,13 @@ class _LoginPageState extends ConsumerState<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () {
-                        //Chemin vers mdp oublié
-                      },
-                      child: Text(
-                        'Mot de passe oublié ?',
-                        style: TextStyle(color: Colors.pinkAccent, fontSize: 20),
-                      ),
+                        onPressed: (){
+                          //Chemin vers mdp oublié
+                        },
+                        child: Text(
+                          'Mot de passe oublié ?',
+                          style: TextStyle(color: Colors.pinkAccent, fontSize: 20),
+                        )
                     ),
                   ],
                 )

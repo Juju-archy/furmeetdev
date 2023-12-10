@@ -1,7 +1,7 @@
 <?php
 
 // Configuration de la base de données
-$servername = "localhost";
+$servername = "192.168.31.61";
 $username = "archyroot";
 $password = "Bavav732!";
 $dbname = "flutter_test";

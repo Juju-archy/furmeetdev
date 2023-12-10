@@ -21,15 +21,3 @@ String generateSalt() {
   final random = Random();
   return List.generate(16, (index) => chars[random.nextInt(chars.length)]).join();
 }
-
-// Fonction pour vérifier le mot de passe
-bool passwordVerify(String password, String storedHash) {
-  // Récupère le sel du hachage stocké (les 128 premiers caractères)
-  String storedSalt = storedHash.substring(0, 128);
-
-  // Génère le hachage du mot de passe fourni avec le sel récupéré
-  String inputHash = hashPasswordWithSalt(password, storedSalt);
-
-  // Compare les hachages
-  return inputHash == storedHash;
-}

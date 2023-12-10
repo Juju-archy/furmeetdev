@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furmeetdev/presentation/widgets/profile_widget.dart';
-import 'package:furmeetdev/presentation/screens/home.dart';
 import 'package:furmeetdev/utils/functions.dart';
-import 'package:furmeetdev/presentation/widgets/drawer.dart';
 import 'package:furmeetdev/data/models/User.dart';
 
 class ProfileUpdate extends StatefulWidget {
@@ -30,7 +28,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
           children: [
             padding(50.0),
             ProfileWidget(
-              imagePath: 'lib/images/furmeet/logo_furmeet.png',
+              imagePath: 'assets/images/logo_furmeet.png',
               isEdit: true,
               onClicked: () async {},
             ),

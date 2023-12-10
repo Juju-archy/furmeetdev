@@ -1,43 +1,58 @@
 <?php
 
-// Vos paramètres de base de données
+// Configuration de la base de données
 $servername = "localhost";
 $username = "archyroot";
 $password = "Bavav732!";
 $dbname = "flutter_test";
 
-// Crée une connexion à la base de données
+// Création de la connexion à la base de données
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Vérifie la connexion
+// Vérifiez la connexion à la base de données
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Erreur de connexion à la base de données : " . $conn->connect_error);
 }
 
-// Récupère les données du formulaire (remplacez 'email' et 'password' par les noms de vos champs dans le formulaire)
-$email = $_POST['uemail'];
-$password = $_POST['UPASS'];
+// Vérifie que les champs sont présents dans la requête GET
+$email = $_GET['uemail'];
 
-// Prépare la requête SQL pour récupérer l'utilisateur avec l'email et le mot de passe correspondants
-$sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-
-$result = $conn->query($sql);
-
-// Vérifie s'il y a des résultats
-if ($result->num_rows > 0) {
-    // L'utilisateur est authentifié avec succès
-    $response['success'] = true;
-    $response['message'] = "Login successful!";
-} else {
-    // L'authentification a échoué
+if (empty($email)) {
     $response['success'] = false;
-    $response['message'] = "Invalid email or password.";
+    $response['message'] = "Email is required.";
+    echo json_encode($response);
+    exit();
 }
 
-// Convertit la réponse en format JSON
-echo json_encode($response);
+// Vérifier la méthode de la requête HTTP
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Utilise des requêtes préparées pour éviter les attaques par injection SQL
+    $stmt = $conn->prepare("SELECT * FROM user WHERE uemail = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-// Ferme la connexion à la base de données
+    if ($result->num_rows >= 0) {
+        $user = $result->fetch_assoc();
+        $storedSalt = $user['SALT']; // Récupérer le sel de l'utilisateur
+        $storedHashedPassword = $user['UPASS']; // Récupérer le mot de passe haché de l'utilisateur
+
+        $response['success'] = true;
+        $response['SALT'] = $storedSalt; // Envoyer le sel à Flutter
+        $response['UPASS'] = $storedHashedPassword; // Envoyer le mot de passe haché à Flutter
+        $response['user'] = $user; // Envoyer les données de l'utilisateur
+    } else {
+        $response['success'] = false;
+        $response['message'] = "Invalid email.";
+    }
+
+    echo json_encode($response);
+}
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
+
 $conn->close();
-
 ?>

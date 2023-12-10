@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:furmeetdev/presentation/screens/connectionPage/login_screen.dart';
 import 'package:furmeetdev/presentation/screens/home.dart';
+import 'package:furmeetdev/presentation/viewmodels/UserViewModel.dart';
 import 'package:furmeetdev/utils/functions.dart';
-//import 'package:furmeet_test/page/profil/profil_user.dart';
 import 'package:furmeetdev/presentation/widgets/drawer.dart';
+import 'package:furmeetdev/presentation/screens/profile/profile_user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginSuccess extends StatefulWidget {
   @override
@@ -10,13 +13,26 @@ class LoginSuccess extends StatefulWidget {
 }
 
 class _LoginSuccessState extends State<LoginSuccess> {
+  String pseudo = '';
 
   @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      pseudo = prefs.getString('pseudo') ?? '';
+    });
+  }
+
   Widget build (BuildContext context) {
     double taille = MediaQuery.of(context).size.width * 0.5;
 
     return GestureDetector(
-      //onTap: (() => FocusScope.of(context).requestFocus(FocusNode())),
+      onTap: (() => FocusScope.of(context).requestFocus(FocusNode())),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -43,15 +59,13 @@ class _LoginSuccessState extends State<LoginSuccess> {
                   ],
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                      image: AssetImage('lib/images/furmeet/logo_furmeet_icon.png')
+                      image: AssetImage('assets/images/logo_furmeet.png')
                   ),
                 ),
               ),
               padding(20.0),
-              textWithStyle('Bienvenue Archy!', color: Colors.redAccent, fontSize: 40.0),
+              textWithStyle('Bienvenue $pseudo!', color: Colors.redAccent, fontSize: 40.0),
               Container(
-                height: taille,
-                width: taille,
                 child: Column(
                   //Profile / Accueil
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -76,12 +90,13 @@ class _LoginSuccessState extends State<LoginSuccess> {
                         ),
                       ),
                     ),
+                    padding(20.0),
                     ElevatedButton(
                       onPressed: (){
                         setState(() {
-                          /*Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
+                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
                             return ProfilUSer();
-                          }));*/
+                          }));
                         });
                       },
                       child: textWithStyle('Profile', fontSize: 30.0, color: Colors.white),
@@ -95,6 +110,16 @@ class _LoginSuccessState extends State<LoginSuccess> {
                         ),
                       ),
                     ),
+                    padding(50.0),
+                    TextButton(
+                      onPressed: () async {
+                        await UserViewModel().logout();
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) {
+                          return LoginPage();
+                        }));
+                      },
+                      child: Text('Déconnexion'),
+                    )
                   ],
                 ),
               )
